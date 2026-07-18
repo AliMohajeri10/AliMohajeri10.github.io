@@ -152,7 +152,31 @@ export function initializeModelViewer({
       camera,
       renderer.domElement
     );
+    const isTouchDevice =
+  window.matchMedia(
+    "(pointer: coarse)"
+  ).matches;
 
+if (isTouchDevice) {
+  /*
+   * Vertical finger movement can scroll the website.
+   * Horizontal movement can still interact with the viewer.
+   * Pinch gestures continue to zoom the model.
+   */
+
+  renderer.domElement.style.touchAction =
+    "pan-y";
+
+  controls.enablePan =
+    false;
+
+  controls.touches.ONE =
+    THREE.TOUCH.ROTATE;
+
+  controls.touches.TWO =
+    THREE.TOUCH.DOLLY_ROTATE;
+}
+    
   controls.enableDamping =
     true;
 
@@ -179,6 +203,8 @@ export function initializeModelViewer({
     0.1,
     0
   );
+
+  
 
   /* =========================================================
      LIGHTING
