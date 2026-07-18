@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="description"
+      content="Ali Mohajeri — Electrical engineer working on embedded systems, power electronics, robotics, and control."
+    />
+
+    <meta name="theme-color" content="#f5f7fa" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <title>Ali Mohajeri | Electrical Engineer</title>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Go to top">
+        <span class="brand-mark">AM</span>
+        <span>Ali Mohajeri</span>
+      </a>
+
+      <button
+        class="menu-button"
+        type="button"
+        aria-label="Open navigation"
+        aria-expanded="false"
+      >
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#expertise">Expertise</a>
+        <a href="#projects">Projects</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Electrical engineering · robotics · control</p>
+
+          <h1>
+            I design electronic systems from power hardware to closed-loop control.
+          </h1>
+
+          <p class="hero-summary">
+            Electrical engineer focused on embedded control, power electronics,
+            communication networks, motor drives, and intelligent robotic systems.
+          </p>
+
+          <div class="hero-actions">
+            <a class="button button-primary" href="#projects">View projects</a>
+
+            <a
+              class="button button-secondary"
+              href="/documents/Ali-Mohajeri-CV.pdf"
+              target="_blank"
+              rel="noreferrer"
+            >
+              View CV
+            </a>
+          </div>
+
+          <dl class="hero-metrics" aria-label="Engineering focus">
+            <div>
+              <dt>Embedded</dt>
+              <dd>STM32 · CAN · SPI</dd>
+            </div>
+
+            <div>
+              <dt>Power</dt>
+              <dd>Motor drives · PCB</dd>
+            </div>
+
+            <div>
+              <dt>Control</dt>
+              <dd>FOC · GP · Robotics</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="portrait-panel reveal">
+          <img
+            class="hero-portrait"
+            src="/images/ali-portrait.webp"
+            alt="Ali Mohajeri, electrical engineer"
+            onerror="this.onerror=null; this.src='/images/ali-portrait-placeholder.svg';"
+          />
+
+          <div class="portrait-overlay">
+            <span>Electrical Engineering</span>
+            <strong>Hardware · Embedded · Control</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="expertise">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Core capabilities</p>
+
+          <h2>Hardware, firmware, and control as one system.</h2>
+
+          <p>
+            My work connects circuit-level decisions with real-time software and
+            system-level dynamic behavior.
+          </p>
+        </div>
+
+        <div class="expertise-grid">
+          <article class="expertise-card expertise-electronics reveal">
+            <span class="card-number">01</span>
+
+            <h3>Electronics</h3>
+
+            <p>
+              Mixed-signal PCB design, high-power distribution, isolated interfaces,
+              protection circuits, signal conditioning, and component selection.
+            </p>
+
+            <ul>
+              <li>Altium Designer</li>
+              <li>Power electronics</li>
+              <li>EMI and protection</li>
+            </ul>
+          </article>
+
+          <article class="expertise-card expertise-embedded reveal">
+            <span class="card-number">02</span>
+
+            <h3>Embedded systems</h3>
+
+            <p>
+              Real-time STM32 firmware, multi-bus communication, device drivers,
+              diagnostics, and integration with higher-level computers.
+            </p>
+
+            <ul>
+              <li>STM32 · C/C++</li>
+              <li>CAN · SPI · UART · I²C</li>
+              <li>Raspberry Pi integration</li>
+            </ul>
+          </article>
+
+          <article class="expertise-card expertise-control reveal">
+            <span class="card-number">03</span>
+
+            <h3>Control engineering</h3>
+
+            <p>
+              Motor-control loops, nonlinear systems, estimation, Gaussian-process
+              modelling, motion planning, and safety-aware control.
+            </p>
+
+            <ul>
+              <li>Field-oriented control</li>
+              <li>MATLAB · Python</li>
+              <li>Learning-based control</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section projects-section" id="projects">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Selected work</p>
+
+          <h2>Engineering projects built around real constraints.</h2>
+        </div>
+
+        <div class="project-list">
+  <!-- ================================================
+       PROJECT 01 — PMSM MOTOR DRIVE
+  ================================================= -->
+
+  <article class="project-card reveal">
+    <div class="project-model-panel">
+      <div class="project-viewer-topbar">
+        <span>Interactive 3D model</span>
+        <span id="motor-model-status">Loading…</span>
+      </div>
+
+      <div
+        id="motor-model-viewer"
+        class="project-model-viewer"
+        aria-label="Interactive 3D model of the PMSM motor drive"
+      ></div>
+
+      <div class="project-viewer-help">
+        Drag to rotate · Scroll to zoom
+      </div>
+    </div>
+
+    <div class="project-content">
+      <p class="project-index">Project 01</p>
+
+      <h3>27 kW PMSM Motor Drive</h3>
+
+      <p>
+        Power-stage and embedded-control development for an axial-flux
+        PMSM, including field-oriented control, inverter protection,
+        current regulation, and velocity control.
+      </p>
+
+      <div class="tag-row">
+        <span>PMSM</span>
+        <span>FOC</span>
+        <span>IGBT</span>
+        <span>STM32</span>
+      </div>
+
+      <a class="text-link" href="#contact">
+        Detailed case study in preparation
+      </a>
+    </div>
+  </article>
+
+  <!-- ================================================
+       PROJECT 02 — INTERFACE BOARD
+  ================================================= -->
+
+  <article class="project-card reveal">
+    <div class="project-model-panel">
+      <div class="project-viewer-topbar">
+        <span>Interactive 3D model</span>
+        <span id="interface-model-status">Loading…</span>
+      </div>
+
+      <div
+        id="interface-model-viewer"
+        class="project-model-viewer"
+        aria-label="Interactive 3D model of the humanoid robot Interface Board"
+      ></div>
+
+      <div class="project-viewer-help">
+        Drag to rotate · Scroll to zoom
+      </div>
+    </div>
+
+    <div class="project-content">
+      <p class="project-index">Project 02</p>
+
+      <h3>Humanoid Robot Interface Board</h3>
+
+      <p>
+        A central communication and isolation platform connecting a
+        Raspberry Pi master to distributed motor drivers through
+        multiple independent CAN buses.
+      </p>
+
+      <div class="tag-row">
+        <span>STM32F7</span>
+        <span>CAN</span>
+        <span>SPI</span>
+        <span>Isolation</span>
+      </div>
+
+      <a class="text-link" href="#contact">
+        Detailed case study in preparation
+      </a>
+    </div>
+  </article>
+
+  <!-- ================================================
+       PROJECT 03 — POWER BOARD
+  ================================================= -->
+
+  <article class="project-card reveal">
+    <div class="project-model-panel">
+      <div class="project-viewer-topbar">
+        <span>Interactive 3D model</span>
+        <span id="power-model-status">Loading…</span>
+      </div>
+
+      <div
+        id="power-model-viewer"
+        class="project-model-viewer"
+        aria-label="Interactive 3D model of the humanoid robot Power Distribution Board"
+      ></div>
+
+      <div class="project-viewer-help">
+        Drag to rotate · Scroll to zoom
+      </div>
+    </div>
+
+    <div class="project-content">
+      <p class="project-index">Project 03</p>
+
+      <h3>Humanoid Power Distribution Board</h3>
+
+      <p>
+        A high-current 48 V distribution architecture with controlled
+        precharge, current sensing, voltage monitoring, switching, and
+        regenerative-energy protection.
+      </p>
+
+      <div class="tag-row">
+        <span>48 VDC</span>
+        <span>Precharge</span>
+        <span>MOSFET</span>
+        <span>Sensing</span>
+      </div>
+
+      <a class="text-link" href="#contact">
+        Detailed case study in preparation
+      </a>
+    </div>
+  </article>
+</div>
+      </section>
+
+      <section class="section about-section" id="about">
+        <div class="about-layout">
+          <div class="section-heading reveal">
+            <p class="eyebrow">About</p>
+
+            <h2>
+              Engineering decisions supported by analysis and validation.
+            </h2>
+          </div>
+
+          <div class="about-copy reveal">
+            <p>
+              I hold a B.Sc. in Electrical Engineering from the University of
+              Tehran. My experience spans robotic electronics, high-power motor
+              drives, embedded communication, PCB design, and learning-based control.
+            </p>
+
+            <p>
+              I approach projects by defining requirements, partitioning the system,
+              evaluating component and architecture tradeoffs, implementing the
+              design, and documenting its limitations and test results.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact-section" id="contact">
+        <div class="contact-copy reveal">
+          <p class="eyebrow">Contact</p>
+          <h2>Technical collaboration and research.</h2>
+        </div>
+
+        <div class="contact-links reveal">
+          <a href="mailto:10.ali.mohajeri@gmail.com">
+            <span>Email</span>
+            <strong>10.ali.mohajeri@gmail.com</strong>
+          </a>
+
+          <a
+            href="https://github.com/AliMohajeri10"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span>GitHub</span>
+            <strong>github.com/AliMohajeri10</strong>
+          </a>
+
+          <a
+            href="https://www.linkedin.com/in/ali-mohajeri-b00808189/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span>LinkedIn</span>
+            <strong>linkedin.com/in/ali-mohajeri-b00808189</strong>
+          </a>
+
+          <a href="tel:+989367493757">
+            <span>Phone number</span>
+            <strong>+98 936 749 3757</strong>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>© <span id="year"></span> Ali Mohajeri</span>
+      <span>Electrical engineering portfolio</span>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
