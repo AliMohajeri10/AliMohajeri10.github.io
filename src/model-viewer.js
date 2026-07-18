@@ -1,477 +1,527 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { MTLLoader } from "three/addons/loaders/MTLLoader.js";
-import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+import {
+  OrbitControls,
+} from "three/addons/controls/OrbitControls.js";
+
+import {
+  MTLLoader,
+} from "three/addons/loaders/MTLLoader.js";
+
+import {
+  OBJLoader,
+} from "three/addons/loaders/OBJLoader.js";
 
 export function initializeModelViewer({
   containerId,
   statusId,
   objFile,
   mtlFile,
-}) {
-  const container = document.querySelector(containerId);
-  const status = document.querySelector(statusId);
 
-  if (!container || !status) {
-    console.warn(
-      `Model viewer was not created because ${containerId} or ${statusId} was not found.`
+  rotation = {
+    x: -0.12,
+    y: 0,
+    z: 0,
+  },
+
+  position = {
+    x: 0,
+    y: 0,
+    z: 0,
+  },
+}) {
+  const container =
+    document.querySelector(containerId);
+
+  const status =
+    document.querySelector(statusId);
+
+  if (!container) {
+    console.error(
+      `Model viewer container was not found: ${containerId}`
     );
+
     return null;
   }
 
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xf1f3f5);
+  if (!status) {
+    console.error(
+      `Model viewer status was not found: ${statusId}`
+    );
 
-  const camera = new THREE.PerspectiveCamera(
-    34,
-    1,
-    0.01,
-    500
+    return null;
+  }
+
+  status.textContent =
+    `Loading ${mtlFile}…`;
+
+  /* =========================================================
+     SCENE
+  ========================================================= */
+
+  const scene =
+    new THREE.Scene();
+
+  scene.background =
+    new THREE.Color(0xffffff);
+
+  /* =========================================================
+     FLOOR POSITION
+  ========================================================= */
+
+  const floorY = -1.35;
+
+  const modelFloorClearance =
+    0.08;
+
+  /* =========================================================
+     CAMERA
+  ========================================================= */
+
+  const camera =
+    new THREE.PerspectiveCamera(
+      38,
+      1,
+      0.01,
+      100
+    );
+
+  camera.position.set(
+    4.7,
+    3.2,
+    5.8
   );
 
-  camera.position.set(5, 3.7, 6.2);
+  /* =========================================================
+     RENDERER
+  ========================================================= */
 
-  const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: false,
-    powerPreference: "high-performance",
-  });
+  let renderer;
+
+  try {
+    renderer =
+      new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference:
+          "high-performance",
+      });
+  } catch (error) {
+    console.error(
+      "WebGL renderer creation failed:",
+      error
+    );
+
+    status.textContent =
+      "WebGL is unavailable";
+
+    return null;
+  }
 
   renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio, 2.5)
+    Math.min(
+      window.devicePixelRatio,
+      1.5
+    )
   );
 
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.92;
+  renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
 
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.enabled =
+    true;
 
-  renderer.sortObjects = true;
+  renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
 
-  container.appendChild(renderer.domElement);
+  renderer.domElement.setAttribute(
+    "aria-label",
+    `Interactive 3D model: ${objFile}`
+  );
 
-  const controls = new OrbitControls(
-    camera,
+  container.appendChild(
     renderer.domElement
   );
 
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.055;
-  controls.enablePan = false;
+  /* =========================================================
+     CONTROLS
+  ========================================================= */
 
-  controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.32;
+  const controls =
+    new OrbitControls(
+      camera,
+      renderer.domElement
+    );
 
-  controls.minDistance = 1;
-  controls.maxDistance = 30;
+  controls.enableDamping =
+    true;
 
-  const roomEnvironment = new RoomEnvironment();
+  controls.dampingFactor =
+    0.06;
 
-  const pmremGenerator =
-    new THREE.PMREMGenerator(renderer);
+  controls.enablePan =
+    false;
 
-  const environmentMap =
-    pmremGenerator.fromScene(
-      roomEnvironment,
-      0.04
-    ).texture;
+  controls.minDistance =
+    2.3;
 
-  scene.environment = environmentMap;
+  controls.maxDistance =
+    12;
 
-  roomEnvironment.dispose();
-  pmremGenerator.dispose();
+  controls.autoRotate =
+    true;
 
-  const keyLight = new THREE.DirectionalLight(
-    0xffffff,
-    1.8
+  controls.autoRotateSpeed =
+    0.7;
+
+  controls.target.set(
+    0,
+    0.1,
+    0
   );
 
-  keyLight.position.set(5, 8, 6);
-  keyLight.castShadow = true;
-
-  keyLight.shadow.mapSize.set(2048, 2048);
-
-  keyLight.shadow.camera.near = 0.1;
-  keyLight.shadow.camera.far = 50;
-
-  keyLight.shadow.camera.left = -10;
-  keyLight.shadow.camera.right = 10;
-  keyLight.shadow.camera.top = 10;
-  keyLight.shadow.camera.bottom = -10;
-
-  keyLight.shadow.bias = -0.0001;
-  keyLight.shadow.normalBias = 0.02;
-
-  scene.add(keyLight);
-
-  const fillLight = new THREE.DirectionalLight(
-    0xd7e5ff,
-    0.45
-  );
-
-  fillLight.position.set(-5, 4, -4);
-  scene.add(fillLight);
+  /* =========================================================
+     LIGHTING
+  ========================================================= */
 
   const hemisphereLight =
     new THREE.HemisphereLight(
       0xffffff,
-      0x6d747c,
-      0.32
+      0xb8c0c8,
+      1.8
     );
 
-  scene.add(hemisphereLight);
-
-  const floor = new THREE.Mesh(
-    new THREE.CircleGeometry(6, 128),
-    new THREE.MeshStandardMaterial({
-      color: 0xe5e8ec,
-      roughness: 0.84,
-      metalness: 0,
-    })
+  scene.add(
+    hemisphereLight
   );
 
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.y = -1.4;
-  floor.receiveShadow = true;
+  const keyLight =
+    new THREE.DirectionalLight(
+      0xffffff,
+      4.2
+    );
 
-  scene.add(floor);
-
-  const grid = new THREE.GridHelper(
-    11,
-    22,
-    0xb5bdc6,
-    0xd4d9df
+  keyLight.position.set(
+    5,
+    7,
+    5
   );
 
-  grid.position.y = -1.395;
-  grid.material.transparent = true;
-  grid.material.opacity = 0.1;
+  keyLight.castShadow =
+    true;
 
-  scene.add(grid);
+  scene.add(
+    keyLight
+  );
 
-  let activeModel = null;
+  const fillLight =
+    new THREE.DirectionalLight(
+      0x9dbfff,
+      2.2
+    );
 
-  function configureAltiumMaterial(material) {
-    if (!material) {
-      return;
-    }
+  fillLight.position.set(
+    -5,
+    2,
+    -4
+  );
 
-    const materialName =
-      String(material.name || "").toLowerCase();
+  scene.add(
+    fillLight
+  );
 
-    material.side = THREE.DoubleSide;
+  /* =========================================================
+     FLOOR
+  ========================================================= */
 
-    material.depthTest = true;
-    material.depthWrite = true;
+  const floor =
+    new THREE.Mesh(
+      new THREE.CircleGeometry(
+        4.2,
+        80
+      ),
 
-    material.alphaTest = 0;
-    material.polygonOffset = false;
+      new THREE.ShadowMaterial({
+        color: 0x17202a,
+        opacity: 0.12,
+        depthWrite: false,
+      })
+    );
 
-    if (materialName === "core") {
-      material.transparent = false;
-      material.opacity = 1;
-      material.depthWrite = true;
+  floor.rotation.x =
+    -Math.PI / 2;
 
-      if (material.color) {
-        material.color.setRGB(
-          0.018,
-          0.028,
-          0.024
-        );
-      }
-    }
+  floor.position.y =
+    floorY;
 
-    if (materialName === "copper") {
-      material.transparent = false;
-      material.opacity = 1;
-      material.depthWrite = true;
+  floor.receiveShadow =
+    true;
 
-      if ("shininess" in material) {
-        material.shininess = 18;
-      }
+  floor.renderOrder =
+    -2;
 
-      if (material.specular) {
-        material.specular.setRGB(
-          0.22,
-          0.16,
-          0.08
-        );
-      }
+  scene.add(
+    floor
+  );
 
-      material.polygonOffset = true;
-      material.polygonOffsetFactor = 2;
-      material.polygonOffsetUnits = 4;
-    }
+  /* =========================================================
+     GRID
+  ========================================================= */
 
-    if (
-      materialName === "solder_t" ||
-      materialName === "solder_b"
-    ) {
-      material.transparent = true;
-      material.opacity = 0.72;
+  const grid =
+    new THREE.GridHelper(
+      8,
+      16,
+      0xcbd3dd,
+      0xe3e7ec
+    );
 
-      material.depthWrite = false;
-      material.depthTest = true;
+  grid.position.y =
+    floorY + 0.01;
 
-      material.polygonOffset = true;
-      material.polygonOffsetFactor = -2;
-      material.polygonOffsetUnits = -4;
+  grid.material.opacity =
+    0.38;
 
-      material.alphaTest = 0.01;
+  grid.material.transparent =
+    true;
 
-      if ("shininess" in material) {
-        material.shininess = 28;
-      }
+  grid.renderOrder =
+    -1;
 
-      if (material.specular) {
-        material.specular.setRGB(
-          0.18,
-          0.22,
-          0.18
-        );
-      }
-    }
+  scene.add(
+    grid
+  );
 
-    if (
-      materialName === "silk_t" ||
-      materialName === "silk_b"
-    ) {
-      material.transparent = false;
-      material.opacity = 1;
-      material.depthWrite = true;
+  let activeModel =
+    null;
 
-      material.polygonOffset = true;
-      material.polygonOffsetFactor = -4;
-      material.polygonOffsetUnits = -8;
+  /* =========================================================
+     PREPARE MODEL
+  ========================================================= */
 
-      if ("shininess" in material) {
-        material.shininess = 6;
-      }
-    }
-
-    if (
-      materialName.startsWith("mat_") ||
-      materialName === "default"
-    ) {
-      material.transparent = false;
-      material.opacity = 1;
-      material.depthWrite = true;
-
-      if ("shininess" in material) {
-        material.shininess = Math.min(
-          material.shininess ?? 5,
-          24
-        );
-      }
-    }
-
-    const textureProperties = [
-      "map",
-      "normalMap",
-      "bumpMap",
-      "specularMap",
-      "alphaMap",
-    ];
-
-    textureProperties.forEach((property) => {
-      const texture = material[property];
-
-      if (!texture) {
-        return;
-      }
-
-      if (property === "map") {
-        texture.colorSpace =
-          THREE.SRGBColorSpace;
-      }
-
-      texture.anisotropy =
-        renderer.capabilities.getMaxAnisotropy();
-
-      texture.needsUpdate = true;
-    });
-
-    material.needsUpdate = true;
-  }
-
-  function splitMultiMaterialMeshes(rootObject) {
-    const replacements = [];
-
-    rootObject.traverse((child) => {
-      if (
-        !child.isMesh ||
-        !Array.isArray(child.material) ||
-        child.material.length <= 1 ||
-        !child.geometry.groups.length
-      ) {
-        return;
-      }
-
-      const groupContainer = new THREE.Group();
-
-      groupContainer.name =
-        `${child.name || "mesh"}_material_groups`;
-
-      groupContainer.position.copy(child.position);
-      groupContainer.rotation.copy(child.rotation);
-      groupContainer.scale.copy(child.scale);
-
-      child.geometry.groups.forEach(
-        (group, groupIndex) => {
-          const material =
-            child.material[group.materialIndex];
-
-          if (!material) {
-            return;
-          }
-
-          const geometry = child.geometry.clone();
-
-          geometry.clearGroups();
-
-          geometry.setDrawRange(
-            group.start,
-            group.count
-          );
-
-          const mesh = new THREE.Mesh(
-            geometry,
-            material
-          );
-
-          mesh.name =
-            `${child.name || "mesh"}_${material.name || groupIndex}`;
-
-          mesh.castShadow = child.castShadow;
-          mesh.receiveShadow = child.receiveShadow;
-
-          const name =
-            String(material.name || "")
-              .toLowerCase();
-
-          if (name === "core") {
-            mesh.renderOrder = 0;
-          } else if (name === "copper") {
-            mesh.renderOrder = 1;
-          } else if (
-            name === "solder_t" ||
-            name === "solder_b"
-          ) {
-            mesh.renderOrder = 2;
-          } else if (
-            name === "silk_t" ||
-            name === "silk_b"
-          ) {
-            mesh.renderOrder = 3;
-          } else {
-            mesh.renderOrder = 4;
-          }
-
-          groupContainer.add(mesh);
-        }
-      );
-
-      replacements.push({
-        original: child,
-        replacement: groupContainer,
-      });
-    });
-
-    replacements.forEach(
-      ({ original, replacement }) => {
-        const parent = original.parent;
-
-        if (!parent) {
+  function prepareObject(object) {
+    object.traverse(
+      (child) => {
+        if (!child.isMesh) {
           return;
         }
 
-        parent.add(replacement);
-        parent.remove(original);
+        /*
+         * Disable shadows for the imported PCB model.
+         * Large Altium OBJ files may contain many small meshes.
+         */
+
+        child.castShadow =
+          false;
+
+        child.receiveShadow =
+          false;
+
+        if (!child.material) {
+          return;
+        }
+
+        const materials =
+          Array.isArray(
+            child.material
+          )
+            ? child.material
+            : [child.material];
+
+        materials.forEach(
+          (material) => {
+            if (!material) {
+              return;
+            }
+
+            /*
+             * Preserve the original Altium MTL settings.
+             */
+
+            if (
+              "metalness" in material
+            ) {
+              material.metalness =
+                Math.min(
+                  material.metalness,
+                  0.55
+                );
+            }
+
+            if (
+              "roughness" in material
+            ) {
+              material.roughness =
+                Math.max(
+                  material.roughness,
+                  0.28
+                );
+            }
+
+            if (material.map) {
+              material.map.colorSpace =
+                THREE.SRGBColorSpace;
+
+              material.map.anisotropy =
+                renderer.capabilities
+                  .getMaxAnisotropy();
+
+              material.map.needsUpdate =
+                true;
+            }
+
+            material.needsUpdate =
+              true;
+          }
+        );
       }
     );
-  }
 
-  function prepareObject(object) {
-    object.traverse((child) => {
-      if (!child.isMesh) {
-        return;
-      }
+    /* ---------------------------------------------------------
+       1. CALCULATE ORIGINAL SIZE
+    --------------------------------------------------------- */
 
-      child.castShadow = true;
-      child.receiveShadow = true;
+    const originalBox =
+      new THREE.Box3()
+        .setFromObject(object);
 
-      const materials =
-        Array.isArray(child.material)
-          ? child.material
-          : [child.material];
-
-      materials.forEach(
-        configureAltiumMaterial
-      );
-    });
-
-    splitMultiMaterialMeshes(object);
-
-    const initialBox =
-      new THREE.Box3().setFromObject(object);
-
-    const initialSize =
-      initialBox.getSize(
+    const originalSize =
+      originalBox.getSize(
         new THREE.Vector3()
       );
 
-    const largestDimension = Math.max(
-      initialSize.x,
-      initialSize.y,
-      initialSize.z
-    );
+    const maxDimension =
+      Math.max(
+        originalSize.x,
+        originalSize.y,
+        originalSize.z
+      );
 
     if (
-      !Number.isFinite(largestDimension) ||
-      largestDimension <= 0
+      !Number.isFinite(
+        maxDimension
+      ) ||
+      maxDimension <= 0
     ) {
       throw new Error(
         "The OBJ model has invalid dimensions."
       );
     }
 
-    const targetSize = 3.6;
-    const scale =
-      targetSize / largestDimension;
+    /* ---------------------------------------------------------
+       2. SCALE MODEL
+    --------------------------------------------------------- */
 
-    object.scale.setScalar(scale);
+    const targetSize =
+      3.4;
+
+    const scale =
+      targetSize /
+      maxDimension;
+
+    object.scale.setScalar(
+      scale
+    );
+
+    object.updateMatrixWorld(
+      true
+    );
+
+    /* ---------------------------------------------------------
+       3. CENTER MODEL
+    --------------------------------------------------------- */
 
     const scaledBox =
-      new THREE.Box3().setFromObject(object);
+      new THREE.Box3()
+        .setFromObject(object);
 
-    const center =
+    const scaledCenter =
       scaledBox.getCenter(
         new THREE.Vector3()
       );
 
-    object.position.sub(center);
+    object.position.sub(
+      scaledCenter
+    );
 
-    const centeredBox =
-      new THREE.Box3().setFromObject(object);
+    /* ---------------------------------------------------------
+       4. APPLY INITIAL ROTATION
+    --------------------------------------------------------- */
+
+    object.rotation.set(
+      rotation.x ?? 0,
+      rotation.y ?? 0,
+      rotation.z ?? 0
+    );
+
+    object.updateMatrixWorld(
+      true
+    );
+
+    /* ---------------------------------------------------------
+       5. FIND LOWEST POINT AFTER ROTATION
+    --------------------------------------------------------- */
+
+    const rotatedBox =
+      new THREE.Box3()
+        .setFromObject(object);
+
+    /*
+     * Calculate how much the model must move upward
+     * so its lowest point remains above the floor.
+     */
+
+    const requiredLift =
+      floorY +
+      modelFloorClearance -
+      rotatedBox.min.y;
 
     object.position.y +=
-      -1.4 -
-      centeredBox.min.y +
-      0.06;
+      requiredLift;
 
-    scene.add(object);
+    /* ---------------------------------------------------------
+       6. APPLY USER POSITION OFFSET
+    --------------------------------------------------------- */
 
-    activeModel = object;
+    object.position.x +=
+      position.x ?? 0;
 
-    fitCameraToObject(object);
+    object.position.y +=
+      position.y ?? 0;
+
+    object.position.z +=
+      position.z ?? 0;
+
+    object.updateMatrixWorld(
+      true
+    );
+
+    /* ---------------------------------------------------------
+       7. ADD TO SCENE
+    --------------------------------------------------------- */
+
+    scene.add(
+      object
+    );
+
+    activeModel =
+      object;
+
+    fitCameraToObject(
+      object
+    );
   }
 
-  function fitCameraToObject(object) {
+  /* =========================================================
+     FIT CAMERA
+  ========================================================= */
+
+  function fitCameraToObject(
+    object
+  ) {
     const box =
-      new THREE.Box3().setFromObject(object);
+      new THREE.Box3()
+        .setFromObject(object);
 
     const size =
       box.getSize(
@@ -483,11 +533,12 @@ export function initializeModelViewer({
         new THREE.Vector3()
       );
 
-    const maximumSize = Math.max(
-      size.x,
-      size.y,
-      size.z
-    );
+    const maxSize =
+      Math.max(
+        size.x,
+        size.y,
+        size.z
+      );
 
     const verticalFov =
       THREE.MathUtils.degToRad(
@@ -495,7 +546,7 @@ export function initializeModelViewer({
       );
 
     let distance =
-      maximumSize /
+      maxSize /
       (
         2 *
         Math.tan(
@@ -503,12 +554,13 @@ export function initializeModelViewer({
         )
       );
 
-    distance *= 1.55;
+    distance *=
+      1.5;
 
     const direction =
       new THREE.Vector3(
         1,
-        0.72,
+        0.7,
         1
       ).normalize();
 
@@ -530,13 +582,15 @@ export function initializeModelViewer({
 
     camera.far =
       Math.max(
-        distance * 30,
+        distance * 20,
         100
       );
 
     camera.updateProjectionMatrix();
 
-    controls.target.copy(center);
+    controls.target.copy(
+      center
+    );
 
     controls.minDistance =
       Math.max(
@@ -550,56 +604,91 @@ export function initializeModelViewer({
     controls.update();
   }
 
+  /* =========================================================
+     LOAD OBJ + MTL
+  ========================================================= */
+
   function loadModel() {
     const modelPath =
       `${import.meta.env.BASE_URL}models/`;
 
-    status.textContent =
-      `Loading ${objFile}…`;
+    const mtlUrl =
+      `${modelPath}${mtlFile}`;
 
-    const materialLoader =
+    const objUrl =
+      `${modelPath}${objFile}`;
+
+    console.log(
+      "Loading MTL:",
+      mtlUrl
+    );
+
+    console.log(
+      "Loading OBJ:",
+      objUrl
+    );
+
+    const mtlLoader =
       new MTLLoader();
 
-    materialLoader.setPath(modelPath);
-    materialLoader.setResourcePath(
+    mtlLoader.setPath(
       modelPath
     );
 
-    materialLoader.setMaterialOptions({
-      normalizeRGB: false,
-      ignoreZeroRGBs: false,
-      invertTrProperty: false,
-      side: THREE.DoubleSide,
-      wrap: THREE.RepeatWrapping,
-    });
+    mtlLoader.setResourcePath(
+      modelPath
+    );
 
-    materialLoader.load(
+    status.textContent =
+      `Loading ${mtlFile}…`;
+
+    mtlLoader.load(
       mtlFile,
 
       (materials) => {
-        materials.preload();
+        try {
+          materials.preload();
+        } catch (error) {
+          console.error(
+            `Material preparation failed for ${mtlFile}:`,
+            error
+          );
 
-        Object.values(
-          materials.materials
-        ).forEach(
-          configureAltiumMaterial
-        );
+          status.textContent =
+            "Material preparation failed";
 
-        const objectLoader =
+          return;
+        }
+
+        status.textContent =
+          `Loading ${objFile}…`;
+
+        const objLoader =
           new OBJLoader();
 
-        objectLoader.setMaterials(materials);
-        objectLoader.setPath(modelPath);
+        objLoader.setMaterials(
+          materials
+        );
 
-        objectLoader.load(
+        objLoader.setPath(
+          modelPath
+        );
+
+        objLoader.load(
           objFile,
 
           (object) => {
             try {
-              prepareObject(object);
+              prepareObject(
+                object
+              );
 
               status.textContent =
                 "OBJ + MTL loaded";
+
+              console.log(
+                `Successfully loaded ${objFile}`
+              );
             } catch (error) {
               console.error(
                 `Model preparation failed for ${objFile}:`,
@@ -613,8 +702,8 @@ export function initializeModelViewer({
 
           (event) => {
             if (
-              event.total &&
-              Number.isFinite(event.total)
+              event.lengthComputable &&
+              event.total > 0
             ) {
               const percentage =
                 Math.round(
@@ -627,6 +716,16 @@ export function initializeModelViewer({
 
               status.textContent =
                 `Loading ${percentage}%`;
+            } else {
+              const megabytes =
+                (
+                  event.loaded /
+                  1024 /
+                  1024
+                ).toFixed(1);
+
+              status.textContent =
+                `Loading ${megabytes} MB`;
             }
           },
 
@@ -637,12 +736,29 @@ export function initializeModelViewer({
             );
 
             status.textContent =
-              `${objFile} not found`;
+              `${objFile} unavailable`;
           }
         );
       },
 
-      undefined,
+      (event) => {
+        if (
+          event.lengthComputable &&
+          event.total > 0
+        ) {
+          const percentage =
+            Math.round(
+              (
+                event.loaded /
+                event.total
+              ) *
+              100
+            );
+
+          status.textContent =
+            `Loading materials ${percentage}%`;
+        }
+      },
 
       (error) => {
         console.error(
@@ -651,23 +767,31 @@ export function initializeModelViewer({
         );
 
         status.textContent =
-          `${mtlFile} not found`;
+          `${mtlFile} unavailable`;
       }
     );
   }
 
-  function resizeRenderer() {
-    const width = Math.max(
-      container.clientWidth,
-      1
-    );
+  /* =========================================================
+     RESPONSIVE RESIZING
+  ========================================================= */
 
-    const height = Math.max(
-      container.clientHeight,
-      1
-    );
+  function resize() {
+    const width =
+      Math.max(
+        container.clientWidth,
+        1
+      );
 
-    camera.aspect = width / height;
+    const height =
+      Math.max(
+        container.clientHeight,
+        1
+      );
+
+    camera.aspect =
+      width / height;
+
     camera.updateProjectionMatrix();
 
     renderer.setSize(
@@ -678,17 +802,28 @@ export function initializeModelViewer({
   }
 
   const resizeObserver =
-    new ResizeObserver(resizeRenderer);
+    new ResizeObserver(
+      resize
+    );
 
-  resizeObserver.observe(container);
-  resizeRenderer();
+  resizeObserver.observe(
+    container
+  );
 
-  let rotationTimer = null;
+  resize();
+
+  /* =========================================================
+     USER INTERACTION
+  ========================================================= */
+
+  let rotationTimer =
+    null;
 
   controls.addEventListener(
     "start",
     () => {
-      controls.autoRotate = false;
+      controls.autoRotate =
+        false;
 
       if (rotationTimer) {
         window.clearTimeout(
@@ -704,21 +839,28 @@ export function initializeModelViewer({
       rotationTimer =
         window.setTimeout(
           () => {
-            controls.autoRotate = true;
+            controls.autoRotate =
+              true;
           },
           2500
         );
     }
   );
 
-  renderer.setAnimationLoop(() => {
-    controls.update();
+  /* =========================================================
+     RENDER LOOP
+  ========================================================= */
 
-    renderer.render(
-      scene,
-      camera
-    );
-  });
+  renderer.setAnimationLoop(
+    () => {
+      controls.update();
+
+      renderer.render(
+        scene,
+        camera
+      );
+    }
+  );
 
   loadModel();
 
