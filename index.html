@@ -200,19 +200,23 @@
     <div class="project-content">
       <p class="project-index">Project 01</p>
 
-      <h3>27 kW PMSM Motor Drive</h3>
+      <h3>2kW PMSM Motor Drive</h3>
 
       <p>
-        Power-stage and embedded-control development for an axial-flux
-        PMSM, including field-oriented control, inverter protection,
-        current regulation, and velocity control.
+        A 2 kW PMSM drive developed for humanoid robot joint actuators,
+        integrating an absolute magnetic encoder and supporting precise
+        position, impedance, velocity, and torque control. The drive receives
+        commands over CAN and includes overcurrent, overvoltage, and
+        stall/locked-rotor protection for safe operation.
       </p>
 
       <div class="tag-row">
+        <span>STM32</span>
         <span>PMSM</span>
         <span>FOC</span>
-        <span>IGBT</span>
-        <span>STM32</span>
+        <span>MOSFET</span>
+        <span>Gate Driver</span>
+        <span>Protections</span>
       </div>
 
       <a class="text-link" href="#contact">
@@ -249,15 +253,20 @@
       <h3>Humanoid Robot Interface Board</h3>
 
       <p>
-        A central communication and isolation platform connecting a
-        Raspberry Pi master to distributed motor drivers through
-        multiple independent CAN buses.
-      </p>
+        A dual-STM32F7 interface board designed as the central communication
+        hub of a humanoid robot. It links a Raspberry Pi master to distributed
+        joint motor drives through eight independent CAN buses while supporting
+        a 1 kHz real-time command cycle. The design integrates isolated power
+        domains, high-speed SPI, RS-485/422, UART, I²C, voltage monitoring, ESD
+        protection, and robust signal isolation for reliable operation in a
+        noisy, high-power robotic system.
+      </p>  
 
       <div class="tag-row">
         <span>STM32F7</span>
-        <span>CAN</span>
-        <span>SPI</span>
+        <span>Multi-CAN</span>
+        <span>Real-Time SPI</span>
+        <span>RS485/RS422</span>
         <span>Isolation</span>
       </div>
 
@@ -295,16 +304,24 @@
       <h3>Humanoid Power Distribution Board</h3>
 
       <p>
-        A high-current 48 V distribution architecture with controlled
-        precharge, current sensing, voltage monitoring, switching, and
-        regenerative-energy protection.
+        A 48 V power distribution board developed for a humanoid robot, delivering
+         high-current power to multiple independently controlled joint-actuator 
+         clusters. Each output integrates controlled precharge, high-side MOSFET 
+         switching, current sensing, voltage monitoring, isolated gate drive, and 
+         regenerative-energy protection. The architecture enables selective power-up, 
+         fault detection, and rapid shutdown of individual clusters, improving system 
+         safety, limiting inrush current, and preventing a failure in one section from 
+         disrupting the entire robot.
       </p>
 
       <div class="tag-row">
         <span>48 VDC</span>
-        <span>Precharge</span>
-        <span>MOSFET</span>
-        <span>Sensing</span>
+        <span>Precharge Control</span>
+        <span>High-Side Switching</span>
+        <span>Fault Protection</span>
+        <span>Current Sensing</span>
+        <span>Voltage Monitoring</span>
+        <span>Regenerative Protection</span>
       </div>
 
       <a class="text-link" href="#contact">
@@ -321,21 +338,25 @@
             <p class="eyebrow">About</p>
 
             <h2>
-              Engineering decisions supported by analysis and validation.
+              My work connects power electronics, embedded systems, and control.
             </h2>
           </div>
 
           <div class="about-copy reveal">
             <p>
               I hold a B.Sc. in Electrical Engineering from the University of
-              Tehran. My experience spans robotic electronics, high-power motor
-              drives, embedded communication, PCB design, and learning-based control.
+              Tehran, with a focus on control and embedded systems. My work combines
+              power electronics, PCB design, real-time firmware, communication
+              networks, motor control, and learning-based methods for robotic
+              applications.
             </p>
 
             <p>
-              I approach projects by defining requirements, partitioning the system,
-              evaluating component and architecture tradeoffs, implementing the
-              design, and documenting its limitations and test results.
+              I enjoy taking a system from its initial requirements to a working
+              prototype: defining the architecture, selecting components, designing
+              the hardware, developing the embedded control software, integrating
+              the subsystems, and testing the final design under real operating
+              conditions.
             </p>
           </div>
         </div>
@@ -344,7 +365,7 @@
       <section class="contact-section" id="contact">
         <div class="contact-copy reveal">
           <p class="eyebrow">Contact</p>
-          <h2>Technical collaboration and research.</h2>
+          <h2>Let’s connect and explore opportunities...</h2>
         </div>
 
         <div class="contact-links reveal">
